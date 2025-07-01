@@ -2,8 +2,12 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
+import { useAppHook } from '@/context/AppProvider';
 
 export default function Navbar() {
+
+  const { logout, authToken } = useAppHook()
+
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isAuthenticated, setIsAuthenticated] = useState(false); // Change this based on your auth state
 
@@ -39,7 +43,7 @@ export default function Navbar() {
 
           {/* Desktop Navigation */}
           <div className="hidden lg:flex items-center space-x-4">
-            {isAuthenticated ? (
+            { authToken ? (
               <>
                 <Link 
                   href="/dashboard" 
@@ -48,7 +52,7 @@ export default function Navbar() {
                   Dashboard
                 </Link>
                 <button
-                  onClick={handleLogout}
+                  onClick={logout}
                   className="bg-red-600 hover:bg-red-700 px-4 py-2 rounded-md transition-colors font-medium"
                 >
                   Logout

@@ -1,4 +1,3 @@
-import Navbar from "@/components/Navbar";
 import Link from 'next/link';
 import Image from 'next/image';
 
@@ -36,9 +35,6 @@ export default function Home() {
   ];
   return (
     <div className="min-h-screen flex flex-col">
-      <header>
-         <Navbar/>
-      </header>
       <div className="min-h-screen">
       {/* Hero Section */}
       <section className="bg-blue-600 text-white text-center py-20">
@@ -50,7 +46,7 @@ export default function Home() {
             Build amazing things with Next.js & Tailwind CSS
           </p>
           <Link 
-            href="/auth" 
+            href="/dashboard" 
             className="inline-block bg-white text-blue-600 font-semibold px-8 py-4 rounded-lg text-lg hover:bg-blue-50 transition-colors shadow-lg hover:shadow-xl transform hover:scale-105 duration-200"
           >
             Get Started

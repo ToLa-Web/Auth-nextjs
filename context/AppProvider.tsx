@@ -10,7 +10,8 @@ interface AppProviderType {
     isloading: boolean,
     authToken:string | null,
     login: (email: string, password: string) => Promise<void>;
-    register: (name: string, email: string, password: string, confirmation_password: string) => Promise<void>
+    register: (name: string, email: string, password: string, confirmation_password: string) => Promise<void>,
+    logout: () => void
 }
 
 const AppContext = createContext<AppProviderType | undefined>(undefined);
@@ -23,7 +24,7 @@ export const AppProvider = ({
   children: React.ReactNode;
 }) => {
 
-    const [isloading, setIsloading] = useState<boolean>(false)
+    const [isloading, setIsloading] = useState<boolean>(true)
     const [authToken, setAuthToken] = useState<string | null>(null)
     const route = useRouter()
 
@@ -36,6 +37,7 @@ export const AppProvider = ({
         }else{
             route.push("/auth")
         }
+        setIsloading(false)
     })
 
     const login = async (email: string, password: string) => {
@@ -81,8 +83,16 @@ export const AppProvider = ({
         }
     };
 
+    const logout = () => {
+        setAuthToken(null)
+        Cookies.remove("authToken")
+        setIsloading(false)
+        toast.success("User Logged out")
+        route.push("/auth")
+    }
+
     return (
-        <AppContext.Provider value={{ login, register, isloading, authToken }}>
+        <AppContext.Provider value={{ login, register, isloading, authToken, logout }}>
             { isloading ? <Loader/> : children}
         </AppContext.Provider>
     );
