@@ -57,13 +57,11 @@ export const AppProvider = ({
                 toast.error("Invalid login")
             }
 
-            console.log(response.data.status)
         } catch (error) {
             
         }finally{
             setIsloading(false);
         }
-
     };
     
     const register = async (name: string, email: string, password: string, confirmation_password: string) => {
@@ -75,7 +73,7 @@ export const AppProvider = ({
                 password, 
                 confirmation_password
             })
-            console.log(response)
+            toast.success(response.data.message)
         } catch (error) {
             
         } finally {

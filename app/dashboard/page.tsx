@@ -3,7 +3,7 @@ import { useAppHook } from "@/context/AppProvider";
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import axios from "axios";
-import toast from "react-hot-toast";
+import toast, { Toaster } from "react-hot-toast";
 import Swal from "sweetalert2";
 
 interface ProductType {
@@ -16,7 +16,7 @@ interface ProductType {
 }
 
 const Dashboard: React.FC = () => {
-  const { isloading, authToken } = useAppHook();
+  const { authToken } = useAppHook();
   //page load when authToken is available
   useEffect(() => {
     if (!authToken) {
@@ -60,16 +60,20 @@ const Dashboard: React.FC = () => {
     try {
       if (isEdit) {
         //edit Operation
-        const response = await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/products/${formData.id}`,{
-          ...formData,
-          "_method": "PUT"
-        }, {
-          headers: {
-            Authorization: `Bearer ${authToken}`,
-            "Content-Type": "multipart/form-data"
+        const response = await axios.post(
+          `${process.env.NEXT_PUBLIC_API_URL}/products/${formData.id}`,
+          {
+            ...formData,
+            _method: "PUT",
+          },
+          {
+            headers: {
+              Authorization: `Bearer ${authToken}`,
+              "Content-Type": "multipart/form-data",
+            },
           }
-        })
-         if (response.data.status) {
+        );
+        if (response.data.status) {
           toast.success(response.data.message);
           setFormData({
             id: 0,
@@ -82,9 +86,9 @@ const Dashboard: React.FC = () => {
           if (fileRef.current) {
             fileRef.current.value = "";
           }
-          setIsEdit(false)
+          setIsEdit(false);
         }
-        fetchAllProduct()
+        fetchAllProduct();
       } else {
         //add Operation
         const response = await axios.post(
@@ -96,8 +100,9 @@ const Dashboard: React.FC = () => {
               "Content-Type": "multipart/form-data",
             },
           }
-        )
+        );
         if (response.data.status) {
+          fetchAllProduct();
           toast.success(response.data.message);
           setFormData({
             id: 0,
@@ -131,6 +136,42 @@ const Dashboard: React.FC = () => {
     } catch (error) {
       console.log(error);
     }
+  };
+
+  const handleDelete = async (id: number) => {
+    Swal.fire({
+      title: "Are you sure?",
+      text: "You won't be able to revert this!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Yes, delete it!",
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        try {
+          const response = await axios.delete(
+            `${process.env.NEXT_PUBLIC_API_URL}/products/${id}`,
+            {
+              headers: {
+                Authorization: `Bearer ${authToken}`,
+              },
+            }
+          );
+          if (response.data.status) {
+            //toast.success(response.data.message)
+            fetchAllProduct();
+            Swal.fire({
+              title: "Deleted!",
+              text: "Your file has been deleted.",
+              icon: "success",
+            });
+          }
+        } catch (error) {
+          console.log(error);
+        }
+      }
+    });
   };
 
   return (
@@ -207,6 +248,9 @@ const Dashboard: React.FC = () => {
                     Title
                   </th>
                   <th className="px-6 py-3 font-semibold tracking-wider">
+                    Description
+                  </th>
+                  <th className="px-6 py-3 font-semibold tracking-wider">
                     Banner
                   </th>
                   <th className="px-6 py-3 font-semibold tracking-wider">
@@ -281,7 +325,10 @@ const Dashboard: React.FC = () => {
                         >
                           Edit
                         </button>
-                        <button className="px-4 py-2 bg-red-600 text-white text-sm font-medium rounded-lg hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-1 transition-all duration-200">
+                        <button
+                          className="px-4 py-2 bg-red-600 text-white text-sm font-medium rounded-lg hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-1 transition-all duration-200"
+                          onClick={() => handleDelete(typeof product.id === "number" ? product.id : 0)}
+                        >
                           Delete
                         </button>
                       </div>
